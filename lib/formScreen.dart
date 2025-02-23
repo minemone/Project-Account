@@ -1,5 +1,5 @@
-import 'package:account/model/transactionItem.dart';
-import 'package:account/provider/transactionProvider.dart';
+import 'package:account/model/training_session.dart';
+import 'package:account/provider/training_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,66 +15,82 @@ class _FormScreenState extends State<FormScreen> {
   final titleController = TextEditingController();
   final amountController = TextEditingController();
 
+  void _submitData() {
+    if (!formKey.currentState!.validate()) return;
+
+    final enteredTitle = titleController.text;
+    final enteredAmount = double.tryParse(amountController.text);
+    if (enteredAmount == null || enteredAmount <= 0) return;
+
+    final session = TrainingSession(
+      title: enteredTitle,
+      cost: enteredAmount,
+      date: DateTime.now(),
+    );
+
+    Provider.of<TrainingProvider>(context, listen: false).addTrainingSession(session);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Input'),
+        title: const Text('เพิ่มข้อมูล'),
       ),
       body: Form(
         key: formKey,
-        child: Column(
-          children: [
-            TextFormField(
-              decoration: InputDecoration(label: const Text('ชื่อรายการ')),
-              autofocus: true,
-              controller: titleController,
-              validator: (String? value) {
-                if(value!.isEmpty){
-                  print('value: $value');
-                  return "กรุณาป้อนชื่อรายการ";
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              decoration: InputDecoration(label: const Text('จำนวนเงิน')),
-              keyboardType: TextInputType.number,
-              controller: amountController,
-              validator: (String? value) {
-                try{
-                  double amount = double.parse(value!);
-                  if(amount <= 0){
-                    return "กรุณาป้อนจำนวนเงินที่มากกว่า 0";
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'ชื่อโปรแกรมฝึกอบรม'),
+                controller: titleController,
+                autofocus: true,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "กรุณาป้อนชื่อโปรแกรม";
                   }
-                  
-                } catch(e){
-                  return "กรุณาป้อนเป็นตัวเลขเท่านั้น";
-                }
-                return null;
-              },
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if(formKey.currentState!.validate()){
-                  // ทำการเพิ่มข้อมูล
-                  var provider = Provider.of<TransactionProvider>(context, listen: false);
-                  
-                  TransactionItem item = TransactionItem(
-                    title: titleController.text,
-                    amount: double.parse(amountController.text),
-                    date: DateTime.now()
-                  );
-
-                  provider.addTransaction(item);
-                  // ปิดหน้าจอ
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('เพิ่มข้อมูล'),
-            ),
-        ],),
+                  return null;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'ค่าใช้จ่าย'),
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "กรุณาป้อนจำนวนเงิน";
+                  }
+                  try {
+                    double cost = double.parse(value);
+                    if (cost <= 0) {
+                      return "กรุณาป้อนจำนวนเงินที่มากกว่า 0";
+                    }
+                  } catch (e) {
+                    return "กรุณาป้อนเป็นตัวเลขเท่านั้น";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _submitData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text(
+                  'เพิ่มข้อมูล',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
