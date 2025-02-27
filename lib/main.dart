@@ -19,12 +19,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TrainingProvider()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Employee Training Program',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          primarySwatch: Colors.lightBlue,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
           useMaterial3: true,
         ),
-        home: const MyHomePage(title: 'Employee training program'),
+        home: const MyHomePage(title: 'Employee Training Program'),
       ),
     );
   }
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -41,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // เรียก initData เพื่อโหลดข้อมูลจากฐานข้อมูล
+    // โหลดข้อมูลจากฐานข้อมูลเมื่อเริ่มต้น
     Provider.of<TrainingProvider>(context, listen: false).initData();
   }
 
@@ -49,8 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(
+          widget.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.lightBlueAccent,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -58,6 +63,12 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return const FormScreen();
               }));
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              Provider.of<TrainingProvider>(context, listen: false).initData();
             },
           ),
         ],
@@ -69,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
             return const Center(
               child: Text(
                 'ไม่มีรายการ',
-                style: TextStyle(fontSize: 50),
+                style: TextStyle(fontSize: 50, color: Colors.grey),
               ),
             );
           } else {
@@ -77,65 +88,89 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: itemCount,
               itemBuilder: (context, int index) {
                 TrainingSession data = provider.sessions[index];
-                String formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(data.date!);
-                return Dismissible(
-                  key: Key(data.keyID.toString()),
-                  direction: DismissDirection.horizontal,
-                  onDismissed: (direction) {
-                    provider.deleteTrainingSession(data);
-                  },
-                  background: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.edit, color: Colors.white),
+                // Format startDate and endDate
+                String formattedStartDate = data.startDate != null
+                    ? DateFormat('yyyy-MM-dd').format(data.startDate!)
+                    : 'N/A';
+                String formattedEndDate = data.endDate != null
+                    ? DateFormat('yyyy-MM-dd').format(data.endDate!)
+                    : 'N/A';
+
+                return Card(
+                  elevation: 5,
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    child: ListTile(
-                      title: Text(data.title),
-                      subtitle: Text('วันที่บันทึกข้อมูล: $formattedDate', style: const TextStyle(fontSize: 10)),
-                      leading: CircleAvatar(
-                        child: FittedBox(
-                          child: Text(data.cost.toString()),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    title: Text(
+                      data.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'ผู้สอน: ${data.instructor}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        Text(
+                          'รายละเอียด: ${data.description}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        Text(
+                          'ระยะเวลาอบรม: $formattedStartDate ถึง $formattedEndDate',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                    leading: CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.lightBlueAccent,
+                      child: FittedBox(
+                        child: Text(
+                          data.cost.toString(),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('ยืนยันการลบ'),
-                                content: const Text('คุณต้องการลบรายการใช่หรือไม่ ?'),
-                                actions: [
-                                  TextButton(
-                                    child: const Text('ยกเลิก'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: const Text('ลบรายการ'),
-                                    onPressed: () {
-                                      provider.deleteTrainingSession(data);
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) {
-                          return EditScreen(session: data);
-                        }));
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Color.fromARGB(255, 255, 0, 0)),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('ยืนยันการลบ'),
+                              content: const Text('คุณต้องการลบรายการใช่หรือไม่ ?'),
+                              actions: [
+                                TextButton(
+                                  child: const Text('ยกเลิก'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text('ลบรายการ'),
+                                  onPressed: () {
+                                    provider.deleteTrainingSession(data);
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                     ),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return EditScreen(session: data);
+                      }));
+                    },
                   ),
                 );
               },

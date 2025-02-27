@@ -1,5 +1,5 @@
-import 'package:account/model/training_session.dart';
 import 'package:flutter/foundation.dart';
+import 'package:account/model/training_session.dart';
 import 'package:account/database/training_db.dart';
 
 class TrainingProvider with ChangeNotifier {
