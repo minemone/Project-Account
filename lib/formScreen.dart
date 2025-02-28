@@ -16,6 +16,7 @@ class _FormScreenState extends State<FormScreen> {
   final amountController = TextEditingController();
   final descriptionController = TextEditingController();
   final instructorController = TextEditingController();
+  final imageUrlController = TextEditingController(); // สำหรับกรอก URL รูปภาพ
 
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
@@ -75,6 +76,9 @@ class _FormScreenState extends State<FormScreen> {
 
     if (enteredAmount == null || enteredAmount <= 0) return;
 
+    // ใช้ URL รูปภาพที่กรอกมา
+    final imageUrl = imageUrlController.text;
+
     final session = TrainingSession(
       title: enteredTitle,
       cost: enteredAmount,
@@ -82,10 +86,10 @@ class _FormScreenState extends State<FormScreen> {
       endDate: _selectedEndDate,
       description: enteredDescription,
       instructor: enteredInstructor,
+      imageUrl: imageUrl, // ใช้ URL ของรูปภาพ
     );
 
-    Provider.of<TrainingProvider>(context, listen: false)
-        .addTrainingSession(session);
+    Provider.of<TrainingProvider>(context, listen: false).addTrainingSession(session);
     Navigator.pop(context);
   }
 
@@ -105,8 +109,8 @@ class _FormScreenState extends State<FormScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextFormField(
-                  decoration: const InputDecoration(labelText: 'ชื่อโปรแกรมฝึกอบรม'),
                   controller: titleController,
+                  decoration: const InputDecoration(labelText: 'ชื่อโปรแกรมฝึกอบรม'),
                   autofocus: true,
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
@@ -117,8 +121,8 @@ class _FormScreenState extends State<FormScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: 'ค่าใช้จ่าย'),
                   controller: amountController,
+                  decoration: const InputDecoration(labelText: 'ค่าใช้จ่าย'),
                   keyboardType: TextInputType.number,
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
@@ -137,8 +141,8 @@ class _FormScreenState extends State<FormScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: 'รายละเอียด'),
                   controller: descriptionController,
+                  decoration: const InputDecoration(labelText: 'รายละเอียด'),
                   keyboardType: TextInputType.multiline,
                   maxLines: 3,
                   validator: (String? value) {
@@ -150,8 +154,8 @@ class _FormScreenState extends State<FormScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: const InputDecoration(labelText: 'ผู้สอน'),
                   controller: instructorController,
+                  decoration: const InputDecoration(labelText: 'ผู้สอน'),
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
                       return "กรุณาป้อนชื่อผู้สอน";
@@ -160,7 +164,20 @@ class _FormScreenState extends State<FormScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // ช่องเลือกวันเริ่มต้นอบรม
+                // ช่องสำหรับกรอก URL ของภาพ
+                TextFormField(
+                  controller: imageUrlController,
+                  decoration: const InputDecoration(labelText: 'กรอก URL รูปภาพ'),
+                  keyboardType: TextInputType.url,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "กรุณากรอก URL ของรูปภาพ";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                // ช่องเลือกวันที่เริ่มต้น
                 Row(
                   children: [
                     Expanded(
@@ -178,7 +195,7 @@ class _FormScreenState extends State<FormScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                // ช่องเลือกวันสิ้นสุดอบรม
+                // ช่องเลือกวันที่สิ้นสุด
                 Row(
                   children: [
                     Expanded(

@@ -2,9 +2,10 @@ import 'package:account/model/training_session.dart';
 import 'package:account/provider/training_provider.dart';
 import 'package:flutter/material.dart';
 import 'formScreen.dart';
-import 'editScreen.dart';
+import 'detailScreen.dart'; // เพิ่มการอ้างอิงไฟล์ใหม่
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -40,11 +41,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  @override
-  void initState() {
-    super.initState();
-    // โหลดข้อมูลจากฐานข้อมูลเมื่อเริ่มต้น
-    Provider.of<TrainingProvider>(context, listen: false).initData();
+  // ฟังก์ชันสุ่มสีที่ตัดกับสีอ่อน
+  Color _getRandomColor() {
+    // สุ่มจากสีที่มีความเข้มสูง
+    List<Color> colorList = [
+      Colors.red.shade700,
+      Colors.green.shade700,
+      Colors.orange.shade700,
+      Colors.purple.shade700,
+      Colors.deepOrange.shade700,
+      Colors.amber.shade700,
+      Colors.cyan.shade700,
+    ];
+
+    Random random = Random();
+    return colorList[random.nextInt(colorList.length)];
   }
 
   @override
@@ -88,7 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: itemCount,
               itemBuilder: (context, int index) {
                 TrainingSession data = provider.sessions[index];
-                // Format startDate and endDate
+
+                // ฟอร์แมทวันที่เริ่มต้นและสิ้นสุด
                 String formattedStartDate = data.startDate != null
                     ? DateFormat('yyyy-MM-dd').format(data.startDate!)
                     : 'N/A';
@@ -96,81 +108,118 @@ class _MyHomePageState extends State<MyHomePage> {
                     ? DateFormat('yyyy-MM-dd').format(data.endDate!)
                     : 'N/A';
 
+                // สุ่มสีที่ตัดกับสีอ่อน
+                Color randomColor = _getRandomColor();
+
                 return Card(
                   elevation: 5,
                   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  color: randomColor, // ใช้สีที่สุ่ม
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16), // เพิ่มความโค้งมน
                   ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    title: Text(
-                      data.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(session: data),
+                        ),
+                      );
+                    },
+                    child: Column(
                       children: [
-                        Text(
-                          'ผู้สอน: ${data.instructor}',
-                          style: const TextStyle(fontSize: 14),
+                        // แสดงรูปภาพ
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                          ),
+                          child: Image.network(
+                            data.imageUrl, // แสดง URL ของรูปภาพ
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        Text(
-                          'รายละเอียด: ${data.description}',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        Text(
-                          'ระยะเวลาอบรม: $formattedStartDate ถึง $formattedEndDate',
-                          style: const TextStyle(fontSize: 14),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Title
+                              Text(
+                                data.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.white, // ใช้สีขาวเพื่อให้ตัดกับพื้นหลัง
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Instructor
+                              Text(
+                                'Instructor: ${data.instructor}',
+                                style: const TextStyle(fontSize: 14, color: Colors.white),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Description
+                              Text(
+                                'Description: ${data.description}',
+                                style: const TextStyle(fontSize: 14, color: Colors.white),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 10),
+
+                              // Duration
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_today,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Duration: $formattedStartDate to $formattedEndDate',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+
+                              // Cost
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.attach_money,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Cost: ${data.cost} THB',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    leading: CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.lightBlueAccent,
-                      child: FittedBox(
-                        child: Text(
-                          data.cost.toString(),
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Color.fromARGB(255, 255, 0, 0)),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('ยืนยันการลบ'),
-                              content: const Text('คุณต้องการลบรายการใช่หรือไม่ ?'),
-                              actions: [
-                                TextButton(
-                                  child: const Text('ยกเลิก'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('ลบรายการ'),
-                                  onPressed: () {
-                                    provider.deleteTrainingSession(data);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) {
-                        return EditScreen(session: data);
-                      }));
-                    },
                   ),
                 );
               },

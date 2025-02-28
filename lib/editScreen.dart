@@ -17,6 +17,7 @@ class _EditScreenState extends State<EditScreen> {
   final amountController = TextEditingController();
   final descriptionController = TextEditingController();
   final instructorController = TextEditingController();
+  final imageUrlController = TextEditingController(); // สำหรับกรอก URL รูปภาพ
 
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
@@ -28,11 +29,13 @@ class _EditScreenState extends State<EditScreen> {
     amountController.text = widget.session.cost.toString();
     descriptionController.text = widget.session.description;
     instructorController.text = widget.session.instructor;
-    _selectedStartDate = widget.session.startDate;
-    _selectedEndDate = widget.session.endDate;
+    imageUrlController.text = widget.session.imageUrl; // กำหนดค่าจากข้อมูลเดิม
+    _selectedStartDate = widget.session.startDate; // กำหนดวันที่เริ่มต้นจากข้อมูลเดิม
+    _selectedEndDate = widget.session.endDate; // กำหนดวันที่สิ้นสุดจากข้อมูลเดิม
   }
 
-  void _presentStartDatePicker() async {
+  // ฟังก์ชันสำหรับเลือกวันที่เริ่มต้น
+  Future<void> _selectStartDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedStartDate ?? DateTime.now(),
@@ -46,7 +49,8 @@ class _EditScreenState extends State<EditScreen> {
     }
   }
 
-  void _presentEndDatePicker() async {
+  // ฟังก์ชันสำหรับเลือกวันที่สิ้นสุด
+  Future<void> _selectEndDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedEndDate ?? DateTime.now(),
@@ -60,14 +64,17 @@ class _EditScreenState extends State<EditScreen> {
     }
   }
 
+  // ฟังก์ชันส่งข้อมูล
   void _submitData() {
     if (!formKey.currentState!.validate()) return;
+
     if (_selectedStartDate == null || _selectedEndDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('กรุณาเลือกวันที่เริ่มต้นและสิ้นสุดอบรม')),
       );
       return;
     }
+
     if (_selectedEndDate!.isBefore(_selectedStartDate!)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('วันสิ้นสุดต้องไม่ก่อนวันเริ่มต้น')),
@@ -83,10 +90,10 @@ class _EditScreenState extends State<EditScreen> {
       endDate: _selectedEndDate,
       description: descriptionController.text,
       instructor: instructorController.text,
+      imageUrl: imageUrlController.text, // ใช้ URL ของรูปภาพ
     );
 
-    Provider.of<TrainingProvider>(context, listen: false)
-        .updateTrainingSession(updatedSession);
+    Provider.of<TrainingProvider>(context, listen: false).updateTrainingSession(updatedSession);
     Navigator.pop(context);
   }
 
@@ -139,7 +146,7 @@ class _EditScreenState extends State<EditScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // ช่องสำหรับรายละเอียด (Description)
+                // ช่องสำหรับรายละเอียด
                 TextFormField(
                   controller: descriptionController,
                   decoration: const InputDecoration(labelText: 'รายละเอียด'),
@@ -153,7 +160,7 @@ class _EditScreenState extends State<EditScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // ช่องสำหรับผู้สอน (Instructor)
+                // ช่องสำหรับผู้สอน
                 TextFormField(
                   controller: instructorController,
                   decoration: const InputDecoration(labelText: 'ผู้สอน'),
@@ -165,7 +172,20 @@ class _EditScreenState extends State<EditScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // ช่องเลือกวันเริ่มต้นอบรม
+                // ช่องสำหรับกรอก URL ของภาพ
+                TextFormField(
+                  controller: imageUrlController,
+                  decoration: const InputDecoration(labelText: 'กรอก URL รูปภาพ'),
+                  keyboardType: TextInputType.url,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอก URL ของรูปภาพ';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                // ช่องเลือกวันที่เริ่มต้น
                 Row(
                   children: [
                     Expanded(
@@ -177,13 +197,13 @@ class _EditScreenState extends State<EditScreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: _presentStartDatePicker,
+                      onPressed: _selectStartDate,
                       child: const Text('เลือกวันเริ่มต้น'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                // ช่องเลือกวันสิ้นสุดอบรม
+                // ช่องเลือกวันที่สิ้นสุด
                 Row(
                   children: [
                     Expanded(
@@ -195,7 +215,7 @@ class _EditScreenState extends State<EditScreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: _presentEndDatePicker,
+                      onPressed: _selectEndDate,
                       child: const Text('เลือกวันสิ้นสุด'),
                     ),
                   ],
