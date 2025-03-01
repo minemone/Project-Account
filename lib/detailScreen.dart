@@ -2,6 +2,8 @@ import 'package:account/model/training_session.dart';
 import 'package:flutter/material.dart';
 import 'editScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:account/provider/training_provider.dart';
+import 'package:provider/provider.dart';
 
 class DetailScreen extends StatelessWidget {
   final TrainingSession session;
@@ -46,7 +48,7 @@ class DetailScreen extends StatelessWidget {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('ยืนยันการลบ', style: TextStyle(fontWeight: FontWeight.bold)),
-                        content: const Text('คุณต้องการลบรายการนี้ใช่หรือไม่?'),
+                        content: const Text('คุณต้องการลบรายการนี้ใช่หรือไม่ ?'),
                         actions: [
                           TextButton(
                             child: const Text('ยกเลิก', style: TextStyle(color: Colors.blue)),
@@ -57,9 +59,11 @@ class DetailScreen extends StatelessWidget {
                           TextButton(
                             child: const Text('ลบรายการ', style: TextStyle(color: Colors.red)),
                             onPressed: () {
-                              // เพิ่มฟังก์ชันการลบที่เหมาะสมที่นี่
-                              // Provider.of<TrainingProvider>(context, listen: false).deleteTrainingSession(session);
-                              Navigator.of(context).pop();
+                              // เรียกใช้ฟังก์ชันการลบจาก Provider
+                              Provider.of<TrainingProvider>(context, listen: false)
+                                  .deleteTrainingSession(session);
+                              Navigator.of(context).pop(); // ปิด AlertDialog
+                              Navigator.of(context).pop(); // กลับไปที่หน้าก่อนหน้า
                             },
                           ),
                         ],
@@ -81,68 +85,105 @@ class DetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
                 session.imageUrl,  
-                height: 180,
+                height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 16),
-            // ชื่อการอบรม
             Text(
               session.title,
               style: const TextStyle(
-                fontWeight: FontWeight.bold, 
-                fontSize: 24, 
-                color: Colors.black87,
+                  fontWeight: FontWeight.bold, 
+                  fontSize: 24, 
+                  color: Colors.black87,
               ),
             ),
             const SizedBox(height: 8),
-            // ผู้สอน
             Text(
-              'ผู้สอน: ${session.instructor}',
+              'Instructor: ${session.instructor}',
               style: const TextStyle(
-                fontSize: 16,
-                color: Colors.deepPurple,
-                fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.deepPurple,
+                  fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
-            // คำอธิบาย
             Text(
-              'คำอธิบาย: ${session.description}',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-              maxLines: 3,
+              'Description: ${session.description}',
+              style: const TextStyle(fontSize: 16, color: Colors.black),
+              maxLines: 10,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 10),
-            // ระยะเวลาอบรม
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 18, color: Colors.grey),
+                const Icon(Icons.calendar_today, size: 18, color: Colors.black),
                 const SizedBox(width: 5),
                 Text(
                   'ระยะเวลาอบรม: $formattedStartDate ถึง $formattedEndDate',
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            // ค่าใช้จ่าย
             Row(
               children: [
-                const Icon(Icons.attach_money, size: 18, color: Colors.grey),
+                const Icon(Icons.attach_money, size: 18, color: Colors.black),
                 const SizedBox(width: 5),
                 Text(
-                  'ค่าใช้จ่าย: ${session.cost} บาท',
-                  style: const TextStyle(
+                  session.cost == 0.0
+                      ? 'ซื้อแล้ว' // ถ้าซื้อแล้วจะขึ้นคำว่า "ซื้อแล้ว"
+                      : 'ค่าใช้จ่าย: ${session.cost} บาท',
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.black87,
+                    color: session.cost == 0.0 ? Colors.red : Colors.black87, // เปลี่ยนสีเมื่อซื้อแล้ว
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
+            // ปุ่มสำหรับซื้อ
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('ยืนยันการซื้อ', style: TextStyle(fontWeight: FontWeight.bold)),
+                      content: const Text('คุณต้องการซื้อโปรแกรมนี้ใช่หรือไม่?'),
+                      actions: [
+                        TextButton(
+                          child: const Text('ยกเลิก', style: TextStyle(color: Colors.blue)),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('ยืนยันการซื้อ', style: TextStyle(color: Colors.green)),
+                          onPressed: () {
+                            // ฟังก์ชันการซื้อ (อัปเดตสถานะ)
+                            session.cost = 0.0; // เปลี่ยนราคาหลังการซื้อ
+                            Provider.of<TrainingProvider>(context, listen: false)
+                                .updateTrainingSession(session);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text(
+                'ซื้อโปรแกรม',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
       ),

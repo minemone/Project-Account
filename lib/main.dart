@@ -113,7 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
                 return Card(
                   elevation: 5,
-                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   color: randomColor, // ใช้สีที่สุ่ม
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16), // เพิ่มความโค้งมน
@@ -152,8 +153,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 data.title,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Colors.white, // ใช้สีขาวเพื่อให้ตัดกับพื้นหลัง
+                                  fontSize: 20,
+                                  color: Colors
+                                      .white, // ใช้สีขาวเพื่อให้ตัดกับพื้นหลัง
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -163,14 +165,16 @@ class _MyHomePageState extends State<MyHomePage> {
                               // Instructor
                               Text(
                                 'Instructor: ${data.instructor}',
-                                style: const TextStyle(fontSize: 14, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
                               ),
                               const SizedBox(height: 8),
 
                               // Description
                               Text(
                                 'Description: ${data.description}',
-                                style: const TextStyle(fontSize: 14, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -188,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   Text(
                                     'Duration: $formattedStartDate to $formattedEndDate',
                                     style: const TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 16,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -201,16 +205,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: [
                                   const Icon(
                                     Icons.attach_money,
-                                    size: 16,
+                                    size: 20,
                                     color: Colors.white,
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    'Cost: ${data.cost} THB',
-                                    style: const TextStyle(
+                                    data.cost == 0.0
+                                        ? 'ซื้อแล้ว'
+                                        : 'Cost: ${data.cost} THB',
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.white,
+                                      fontSize: 18,
+                                      color: data.cost == 0.0
+                                          ? const Color.fromARGB(255, 255, 255, 255)
+                                          : Colors.white,
                                     ),
                                   ),
                                 ],
