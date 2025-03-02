@@ -27,7 +27,7 @@ class TrainingProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTrainingSession(TrainingSession session) async {
+  Future<void> updateTrainingSession(TrainingSession session) async {
     var db = TrainingDB(dbName: 'training.db');
     await db.updateData(session);
     sessions = await db.loadAllData();

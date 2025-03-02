@@ -26,9 +26,9 @@ class TrainingDB {
       'cost': session.cost,
       'startDate': session.startDate?.toIso8601String(),
       'endDate': session.endDate?.toIso8601String(),
-      'description': session.description,  // เพิ่ม description
-      'instructor': session.instructor,    // เพิ่ม instructor
-      'imageUrl': session.imageUrl,        // เพิ่ม imageUrl
+      'description': session.description,  
+      'instructor': session.instructor,   
+      'imageUrl': session.imageUrl,      
     });
     db.close();
     return keyID;
