@@ -68,12 +68,29 @@ class _DetailScreenState extends State<DetailScreen> {
     try {
        Provider.of<TrainingProvider>(context, listen: false)
           .deleteTrainingSession(widget.session);
-      await Future.delayed(const Duration(seconds: 2)); // แสดง Loading Animation 3 วินาที
+      await Future.delayed(const Duration(seconds: 3)); // แสดง Loading Animation 3 วินาที
       setState(() {
         _isDeleting = false;
       });
 
-      Navigator.of(context).pop(); // ปิดหน้ารายละเอียด
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('ลบข้อมูลสำเร็จ', style: TextStyle(fontWeight: FontWeight.bold)),
+            content: const Text('คุณได้ลบข้อมูลโปรแกรมฝึกอบรมเรียบร้อยแล้ว'),
+            actions: [
+              TextButton(
+                child: const Text('ตกลง', style: TextStyle(color: Colors.green)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     } catch (e) {
       setState(() {
         _isDeleting = false;
