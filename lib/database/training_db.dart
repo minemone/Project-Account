@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:account/model/training_session.dart';
+import 'package:employeetrainingprogram_app/model/training_session.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';

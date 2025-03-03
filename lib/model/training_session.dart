@@ -2,11 +2,11 @@ class TrainingSession {
   int? keyID;
   String title;
   double cost;
-  DateTime? startDate;  // วันที่เริ่มต้น
-  DateTime? endDate;    // วันที่สิ้นสุด
+  DateTime? startDate; 
+  DateTime? endDate;    
   String description;
   String instructor;
-  String imageUrl; // URL ของรูปภาพ
+  String imageUrl;
 
   TrainingSession({
     this.keyID,
@@ -16,10 +16,10 @@ class TrainingSession {
     this.endDate,
     required this.description,
     required this.instructor,
-    required this.imageUrl,  // เพิ่มการเก็บ URL รูปภาพ
+    required this.imageUrl,  
   });
 
-  // แปลงเป็น Map สำหรับบันทึกลงฐานข้อมูล
+  
   Map<String, dynamic> toMap() {
     return {
       'keyID': keyID,
@@ -29,7 +29,7 @@ class TrainingSession {
       'endDate': endDate?.toIso8601String(),
       'description': description,
       'instructor': instructor,
-      'imageUrl': imageUrl,  // เพิ่มการจัดการรูปภาพ
+      'imageUrl': imageUrl, 
     };
   }
 

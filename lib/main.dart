@@ -1,5 +1,5 @@
-import 'package:account/model/training_session.dart';
-import 'package:account/provider/training_provider.dart';
+import 'package:employeetrainingprogram_app/model/training_session.dart';
+import 'package:employeetrainingprogram_app/provider/training_provider.dart';
 import 'package:flutter/material.dart';
 import 'formScreen.dart';
 import 'detailScreen.dart'; // เพิ่มการอ้างอิงไฟล์ใหม่

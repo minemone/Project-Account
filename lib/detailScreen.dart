@@ -1,8 +1,8 @@
-import 'package:account/model/training_session.dart';
+import 'package:employeetrainingprogram_app/model/training_session.dart';
 import 'package:flutter/material.dart';
 import 'editScreen.dart';
 import 'package:intl/intl.dart';
-import 'package:account/provider/training_provider.dart';
+import 'package:employeetrainingprogram_app/provider/training_provider.dart';
 import 'package:provider/provider.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -68,7 +68,7 @@ class _DetailScreenState extends State<DetailScreen> {
     try {
        Provider.of<TrainingProvider>(context, listen: false)
           .deleteTrainingSession(widget.session);
-      await Future.delayed(const Duration(seconds: 3)); // แสดง Loading Animation 3 วินาที
+      await Future.delayed(const Duration(seconds: 2)); // แสดง Loading Animation 3 วินาที
       setState(() {
         _isDeleting = false;
       });
@@ -179,35 +179,35 @@ class _DetailScreenState extends State<DetailScreen> {
                 const SizedBox(height: 16),
                 Text(
                   widget.session.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black87),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black87), // ปรับขนาดตัวหนังสือ
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Instructor: ${widget.session.instructor}',
-                  style: const TextStyle(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 18, color: Colors.deepPurple, fontWeight: FontWeight.w600), // ปรับขนาดตัวหนังสือ
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Description: ${widget.session.description}',
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                  style: const TextStyle(fontSize: 18, color: Colors.black), // ปรับขนาดตัวหนังสือ
                   maxLines: 10,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, size: 18, color: Colors.black),
+                    const Icon(Icons.calendar_today, size: 20, color: Colors.black), // ปรับขนาดไอคอน
                     const SizedBox(width: 5),
                     Text(
                       'ระยะเวลาอบรม: $formattedStartDate ถึง $formattedEndDate',
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      style: const TextStyle(fontSize: 18, color: Colors.black), // ปรับขนาดตัวหนังสือ
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    const Icon(Icons.attach_money, size: 18, color: Colors.black),
+                    const Icon(Icons.attach_money, size: 20, color: Colors.black), // ปรับขนาดไอคอน
                     const SizedBox(width: 5),
                     Text(
                       widget.session.cost == 0.0
@@ -215,7 +215,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           : 'ค่าใช้จ่าย: ${widget.session.cost} บาท',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 20, // ปรับขนาดตัวหนังสือ
                         color: widget.session.cost == 0.0 ? Colors.red : Colors.black87,
                       ),
                     ),
@@ -251,8 +251,8 @@ class _DetailScreenState extends State<DetailScreen> {
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
                   child: _isLoading
-                      ? const Text('กำลังซื้อ...', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
-                      : const Text('ซื้อโปรแกรม', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ? const Text('กำลังซื้อ...', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)) // ปรับขนาดตัวหนังสือ
+                      : const Text('ซื้อโปรแกรม', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // ปรับขนาดตัวหนังสือ
                 ),
               ],
             ),

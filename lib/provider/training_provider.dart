@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:account/model/training_session.dart';
-import 'package:account/database/training_db.dart';
+import 'package:employeetrainingprogram_app/model/training_session.dart';
+import 'package:employeetrainingprogram_app/database/training_db.dart';
 
 class TrainingProvider with ChangeNotifier {
   List<TrainingSession> sessions = [];
